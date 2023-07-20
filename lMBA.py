@@ -147,10 +147,10 @@ if __name__ == '__main__':
                 if(example.find("#") != -1):
                     continue
                 exps = example.split(",")
-                if simplify(exps[0].strip(),num_of_bits) == simplify(exps[1].strip(),num_of_bits):
+                if not simplify(f"{exps[0].strip()}-({exps[1].strip()})",num_of_bits):
                     right_num += 1
                 else:
-                    print(f"wrong result: {exps[0]} != {exps[-1]}")
+                    print(f"wrong result: {exps[0]} != {exps[1]}")
             t2 = time.perf_counter()
 
 
