@@ -45,7 +45,8 @@ def gen_elements(vars: list, k:int):
     elements.insert(0,"1")
     return elements
 
-def judge(MBA_exp: str):
+def calc_n_k(MBA_exp: str):
+    # 求n元k次MBA的具体n与k值    
     vars = []
     
     k = get_degree(ast.parse(MBA_exp).body[0])
@@ -61,8 +62,29 @@ def judge(MBA_exp: str):
     # print(vars,k)
     return (vars,k)
 
+def judge_equal(MBA_exp1: str, MBA_exp2:str, num_of_bits:int):
+    MBA_exp3 = f"{MBA_exp1}-({MBA_exp2})"
+    vars,k = calc_n_k(MBA_exp3)  
+    n = len(vars)  
+    if(k==1):
+        if(n == 1):
+            domain = [0,1]
+        else:
+            domain = list(it.product(*[[i for i in range(2)] for _ in range(n)]))
+    else:
+        domain = p2_domain[n-1] 
+    eval_code = f"[{MBA_exp3} for "+ ",".join(vars) +" in domain]"
+    result = eval(eval_code)
+    # print(result)
+    for item in result:
+        if((item % 2**num_of_bits) != 0):
+            return False
+    return True
+    
+
+
 def simplify(MBA_exp: str, num_of_bits: int, sign=True):
-    vars,k = judge(MBA_exp)    # vars is a list and k is power
+    vars,k = calc_n_k(MBA_exp)    # vars is a list and k is power
     n = len(vars)
     
     if(k==1):
@@ -147,10 +169,11 @@ if __name__ == '__main__':
                 if(example.find("#") != -1):
                     continue
                 exps = example.split(",")
-                if not simplify(f"{exps[0].strip()}-({exps[1].strip()})",num_of_bits):
+                if judge_equal(exps[0].strip(),exps[1].strip(), num_of_bits):
                     right_num += 1
                 else:
                     print(f"wrong result: {exps[0]} != {exps[1]}")
+                    
             t2 = time.perf_counter()
 
 
